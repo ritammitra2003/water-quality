@@ -1,61 +1,136 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Water Quality Monitoring</title>
+<title>AquaGuard Analytics</title>
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 <style>
-body{
-    font-family: Arial;
-    text-align:center;
-    margin-top:50px;
-}
-h1{color:#333;}
-span{
-    font-weight:bold;
-    font-size:22px;
-    color:blue;
-}
-</style>
 
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background:#f4f7fb;
+}
+
+.header{
+    background:#0a74da;
+    color:white;
+    padding:15px;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    margin:15px 0;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+.grid{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.box{
+    flex:1;
+    min-width:200px;
+    text-align:center;
+}
+
+.value{
+    font-size:32px;
+    font-weight:bold;
+    color:#0a74da;
+}
+
+.status{
+    font-size:26px;
+    font-weight:bold;
+}
+
+.safe{ color:green; }
+.unsafe{ color:red; }
+
+</style>
 </head>
 
 <body>
 
-<h1>Water Quality Monitoring</h1>
+<div class="header">
+💧 AquaGuard Analytics Dashboard
+</div>
 
-<p>pH: <span id="ph">--</span></p>
-<p>TDS: <span id="tds">--</span></p>
-<p>Turbidity: <span id="turb">--</span></p>
-<p>Status: <span id="status">--</span></p>
+<div class="container">
+
+<div class="card grid">
+
+<div class="box">
+pH Level
+<div class="value" id="ph">--</div>
+</div>
+
+<div class="box">
+Turbidity (NTU)
+<div class="value" id="turb">--</div>
+</div>
+
+<div class="box">
+TDS (PPM)
+<div class="value" id="tds">--</div>
+</div>
+
+</div>
+
+<div class="card">
+Water Quality Status:
+<div id="status" class="status">--</div>
+</div>
+
+</div>
 
 <script>
 
-// HiveMQ Cloud connection (edited)
+// MQTT connection
 const client = mqtt.connect(
 'wss://e9ca428a261c4e6bb3ead99d660c0e93.s1.eu.hivemq.cloud:8884/mqtt',
 {
-username: 'waterquality',
-password: 'Password2026'
+username:'waterquality',
+password:'Password2026'
 }
 );
 
-// Connected
 client.on('connect', function () {
-    console.log("Connected to MQTT Cloud");
+    console.log("Connected MQTT");
     client.subscribe('ritam/water/project');
 });
 
-// Receive data
 client.on('message', function (topic, message) {
 
-    let data = message.toString().split(",");
+    let d = message.toString().split(",");
 
-    document.getElementById("ph").innerText = data[0];
-    document.getElementById("tds").innerText = data[1];
-    document.getElementById("turb").innerText = data[2];
-    document.getElementById("status").innerText = data[3];
+    document.getElementById("ph").innerText = d[0];
+    document.getElementById("tds").innerText = d[1];
+    document.getElementById("turb").innerText = d[2];
+
+    let statusEl = document.getElementById("status");
+    statusEl.innerText = d[3];
+
+    if(d[3] === "SAFE"){
+        statusEl.className="status safe";
+    }else{
+        statusEl.className="status unsafe";
+    }
+
 });
 
 </script>
