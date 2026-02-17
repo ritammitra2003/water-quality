@@ -102,10 +102,9 @@ Water Quality Status:
 
 // MQTT connection
 const client = mqtt.connect(
-'wss://e9ca428a261c4e6bb3ead99d660c0e93.s1.eu.hivemq.cloud:8884/mqtt',
+'wss://broker.hivemq.com:8884/mqtt',
 {
-username:'waterquality',
-password:'Password2026'
+
 }
 );
 
@@ -137,3 +136,4 @@ client.on('message', function (topic, message) {
 
 </body>
 </html>
+
