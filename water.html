@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Water Quality Monitoring</title>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    text-align:center;
+    margin-top:50px;
+}
+h1{color:#333;}
+span{
+    font-weight:bold;
+    font-size:22px;
+    color:blue;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Water Quality Monitoring</h1>
+
+<p>pH: <span id="ph">--</span></p>
+<p>TDS: <span id="tds">--</span></p>
+<p>Turbidity: <span id="turb">--</span></p>
+<p>Status: <span id="status">--</span></p>
+
+<script>
+
+// HiveMQ Cloud connection (edited)
+const client = mqtt.connect(
+'wss://e9ca428a261c4e6bb3ead99d660c0e93.s1.eu.hivemq.cloud:8884/mqtt',
+{
+username: 'waterquality',
+password: 'Password2026'
+}
+);
+
+// Connected
+client.on('connect', function () {
+    console.log("Connected to MQTT Cloud");
+    client.subscribe('ritam/water/project');
+});
+
+// Receive data
+client.on('message', function (topic, message) {
+
+    let data = message.toString().split(",");
+
+    document.getElementById("ph").innerText = data[0];
+    document.getElementById("tds").innerText = data[1];
+    document.getElementById("turb").innerText = data[2];
+    document.getElementById("status").innerText = data[3];
+});
+
+</script>
+
+</body>
+</html>
