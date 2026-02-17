@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>aquaGuard Analytics</title>
+<title>AquaGuard Analytics</title>
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
@@ -19,6 +19,7 @@ body{
     padding:15px;
     font-size:22px;
     font-weight:bold;
+    text-align:center;
 }
 
 .container{
@@ -54,7 +55,7 @@ body{
 }
 
 .status{
-    font-size:26px;
+    font-size:28px;
     font-weight:bold;
 }
 
@@ -100,22 +101,34 @@ Water Quality Status:
 
 <script>
 
-// MQTT connection
+// MQTT connection (HiveMQ Cloud)
 const client = mqtt.connect(
-'wss://broker.hivemq.com:8884/mqtt',
+'wss://e9ca428a261c4e6bb3ead99d660c0e93.s1.eu.hivemq.cloud:8884/mqtt',
 {
-
+username: 'waterquality',
+password: 'Password2026',
+connectTimeout: 4000,
+reconnectPeriod: 1000
 }
 );
 
+// Connected
 client.on('connect', function () {
-    console.log("Connected MQTT");
+    console.log("MQTT Connected");
     client.subscribe('ritam/water/project');
 });
 
+// Error handling
+client.on('error', function (err) {
+    console.log("MQTT Error:", err);
+});
+
+// Receive Data
 client.on('message', function (topic, message) {
 
     let d = message.toString().split(",");
+
+    if(d.length < 4) return;
 
     document.getElementById("ph").innerText = d[0];
     document.getElementById("tds").innerText = d[1];
@@ -126,7 +139,7 @@ client.on('message', function (topic, message) {
 
     if(d[3] === "SAFE"){
         statusEl.className="status safe";
-    }else{
+    } else {
         statusEl.className="status unsafe";
     }
 
@@ -136,5 +149,3 @@ client.on('message', function (topic, message) {
 
 </body>
 </html>
-
-
